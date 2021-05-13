@@ -190,10 +190,6 @@ lines(x,knn_train_mrmr_scale2$specificityInfo$meanSpecificity[10:15], col='#FF8B
 lines(x,knn_train_mrmr_scale2$F1Info$meanF1[10:15], col='red', lwd=2, lty=4)
 legend(x=14.305 ,y =0.8345, c('Accuracy', 'Sensitivity','Specificity','F1-Score'), lty = c(1,2,4,5), col = c('black','blue','#FF8B00','red'))
 
-#confusion matrix plot
-dataPlot(knn_test_mrmr_scale2$cfMats[[14]]$table, labels = test_labels_scale  ,mode = "confusionMatrix",toPNG = FALSE, toPDF = FALSE)
-
-
 #svm
 svm_train_mrmr_scale2 <- svm_trn(t(train_matrix_scale), as.factor(train_labels_scale), names(gene_mrmr_scale2), 5) 
 svm_test_mrmr_scale2 <- svm_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), names(gene_mrmr_scale2), bestParameters =  svm_train_mrmr_scale2$bestParameters)
@@ -211,24 +207,23 @@ svm_test_limma_scale2 <- svm_test(t(train_matrix_scale), as.factor(train_labels_
 rf_train_mrmr_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), names(gene_mrmr_scale2), 5) 
 rf_test_mrmr_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), names(gene_mrmr_scale2), bestParameters =  rf_train_mrmr_scale2$bestParameters)
 
-rf_train_rf_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), gene_rf_scale2[1:20], 5) 
-rf_test_rf_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), gene_rf_scale2[1:20], bestParameters =  rf_train_rf_scale2$bestParameters)
+rf_train_rf_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), gene_rf_scale2, 5) 
+rf_test_rf_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), gene_rf_scale2, bestParameters =  rf_train_rf_scale2$bestParameters)
 
-rf_train_da_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), names(gene_da_scale2)[1:20], 5) 
-rf_test_da_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), names(gene_da_scale2)[1:20], bestParameters =  rf_train_da_scale2$bestParameters)
+rf_train_da_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), names(gene_da_scale2), 5) 
+rf_test_da_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), names(gene_da_scale2), bestParameters =  rf_train_da_scale2$bestParameters)
 
-rf_train_limma_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), gene_limma_scale2[1:20], 5) 
-rf_test_limma_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), gene_limma_scale2[1:20], bestParameters =  rf_train_limma_scale2$bestParameters)
+rf_train_limma_scale2 <- rf_trn(t(train_matrix_scale), as.factor(train_labels_scale), gene_limma_scale2, 5) 
+rf_test_limma_scale2 <- rf_test(t(train_matrix_scale), as.factor(train_labels_scale), t(test_matrix_scale), as.factor(test_labels_scale), gene_limma_scale2, bestParameters =  rf_train_limma_scale2$bestParameters)
 
-
+#confusion matrix plot
+dataPlot(svm_test_mrmr_scale2$cfMats[[15]]$table, labels = test_labels_scale  ,mode = "confusionMatrix",toPNG = FALSE, toPDF = FALSE)
 
 # AUC plot
 response <- as.factor(test_labels_scale)
 aucs <- rep(NA, length(levels(response))) # store AUCs
 legendLabels <- as.character()
 colours <- c('red','blue','green','black')
-
-par(oma = c(5, 1, 0, 1))
 plot(x=NA, y=NA, xlim=c(0,1), ylim=c(0,1),
      ylab="Sensitivity",
      xlab="1 - Specificity",
@@ -239,11 +234,11 @@ for (i in seq_along(levels(response))) {
   binaryTraining.labels <- as.factor(train_labels_scale == cur.class)
   binaryTest.labels <- as.factor(test_labels_scale == cur.class)
   
-  binary_knn_cv_mrmr_results <- knn_trn(t(train_matrix_scale), binaryTraining.labels, names(gene_mrmr_scale2)[1:20])
+  binary_svm_cv_mrmr_results <- svm_trn(t(train_matrix_scale), binaryTraining.labels, names(gene_mrmr_scale2)[1:15],5)
   
-  binary_knn_test_mrmr_results <- knn_test(t(train_matrix_scale), binaryTraining.labels, t(test_matrix_scale), binaryTest.labels, names(gene_mrmr_scale2)[1:20], bestK = binary_knn_cv_mrmr_results$bestK)
+  binary_svm_test_mrmr_results <- svm_test(t(train_matrix_scale), binaryTraining.labels, t(test_matrix_scale), binaryTest.labels, names(gene_mrmr_scale2)[1:15], bestParameters = svm_train_mrmr_scale2$bestParameters)
   
-  score <- binary_knn_test_mrmr_results$predictions[[13]]
+  score <- binary_svm_test_mrmr_results$predictions[[15]]
   score <- as.vector(score)
   score[score=='FALSE'] <- 0
   score[score=='TRUE'] <- 1
@@ -263,6 +258,7 @@ for (i in seq_along(levels(response))) {
 }
 
 print(paste0("Mean AUC under the precision-recall curve is: ", round(mean(aucs), 2)))
+
 lines(x=c(0,1), c(0,1))
 legend(x=0.5 ,y =0.3, legendLabels, lty=1, ncol= 1,inset = c(0,0),  col = colours, cex = 1.3,lwd=3)
 
@@ -289,6 +285,11 @@ par(fig = c(0, 1, 0, 1), oma = c(20, 0, 0, 40), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
 labelegend <- c('Non viral ARI','Control','SC2','Viral ARI')
 legend("bottom", labelegend, ncol= 1,inset = .02, fill = c('blue','red','green','black'), cex = 1.1)
+          
+#t-SNE clustering
+#BiocManager::install("M3C")
+library(M3C)
+tsne(expression_matrix_norm_scale_fix_out[which(rownames(expression_matrix_norm_scale_fix_out)%in%names(gene_mrmr_scale2)[1:15]),],labels=as.factor(labels_scale),controlscale=TRUE, scale=3, colvec = c('red','blue','green','black'))
 
 
 
