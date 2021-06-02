@@ -136,10 +136,8 @@ GSE156063_I <- GSE156063_I[order(rownames(GSE156063_I)),]
 GSE149273_I <- GSE149273_I[order(rownames(GSE149273_I)),] 
 GSE152075_I <- GSE152075_I[order(rownames(GSE152075_I)),] 
 GSE163151_I <- GSE163151_I[order(rownames(GSE163151_I)),] 
-batch <- c(rep(1,227), rep(2,86), rep(3,430), rep(4,337), rep(5,50))
 labels <- c(GSE156063_lab,GSE149273_lab,GSE152075_lab,GSE163151_lab,GSE162835_lab)
 expression_matrix <- cbind(GSE156063_I,GSE149273_I,GSE152075_I,GSE163151_I,GSE162835_I)
-summary <- cbind(t(expression_matrix),labels,batch)
 
 
 # Normalization
@@ -184,10 +182,10 @@ knn_test_limma_scale2 <- knn_test(t(train_matrix_scale), as.factor(train_labels_
 
 
 #Validation plot
-plot(x,knn_train_mrmr_scale2$accuracyInfo$meanAccuracy[10:15], type = 'l', col= 'black', ylab='Metric Performance', xlab='Genes', lwd=2, ylim = c(0.8,1), panel.first = grid(col='gray45'))
-lines(x,knn_train_mrmr_scale2$sensitivityInfo$meanSensitivity[10:15], col='blue', lwd=2, lty=2)
-lines(x,knn_train_mrmr_scale2$specificityInfo$meanSpecificity[10:15], col='#FF8B00', lwd=2, lty=4)
-lines(x,knn_train_mrmr_scale2$F1Info$meanF1[10:15], col='red', lwd=2, lty=4)
+plot(x,knn_train_mrmr_scale2$accuracyInfo$meanAccuracy, type = 'l', col= 'black', ylab='Metric Performance', xlab='Genes', lwd=2, ylim = c(0.8,1), panel.first = grid(col='gray45'))
+lines(x,knn_train_mrmr_scale2$sensitivityInfo$meanSensitivity, col='blue', lwd=2, lty=2)
+lines(x,knn_train_mrmr_scale2$specificityInfo$meanSpecificity, col='#FF8B00', lwd=2, lty=4)
+lines(x,knn_train_mrmr_scale2$F1Info$meanF1, col='red', lwd=2, lty=4)
 legend(x=14.305 ,y =0.8345, c('Accuracy', 'Sensitivity','Specificity','F1-Score'), lty = c(1,2,4,5), col = c('black','blue','#FF8B00','red'))
 
 #svm
@@ -288,11 +286,13 @@ legend("bottom", labelegend, ncol= 1,inset = .02, fill = c('blue','red','green',
           
 #t-SNE clustering
 #BiocManager::install("M3C")
-library(M3C)
+require(M3C)
 tsne(expression_matrix_norm_scale_fix_out[which(rownames(expression_matrix_norm_scale_fix_out)%in%names(gene_mrmr_scale2)[1:15]),],labels=as.factor(labels_scale),controlscale=TRUE, scale=3, colvec = c('red','blue','green','black'))
 
 
-
+# boxplot 
+order_genes <- expression_matrix_norm_scale_fix_out[which(rownames(expression_matrix_norm_scale_fix_out) %in% names(gene_mrmr_scale2[1:15])),]
+dataPlot(order_genes[c(7,9,8,2,15,10,11,4,13,5,12,6,1,3,14),],labels_scale,mode = "genesBoxplot",toPNG = FALSE, colours = c("darkred", "forestgreen", "darkorchid3", "dodgerblue3"),colnumber = 3)
 
 
 
