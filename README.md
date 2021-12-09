@@ -4,4 +4,4 @@ This code allow to integrate several RNA-Seq cohort in one expression matrix, to
 
 Gene expression data needed to run the code is available at: https://drive.google.com/drive/u/1/folders/1zt8louDU4iy0aKjt3o_ezAYnev3TZqe6 
 
-Shiny app code is available at shiny.R script. To run the app you should download shiny folder available at https://drive.google.com/file/d/1U5de2BujV-JOcj93wPmkBo5mKzo7Noes/view?usp=sharing.
+Shiny app code is available at app.R script. To run the app you should download shiny folder available at https://drive.google.com/file/d/1U5de2BujV-JOcj93wPmkBo5mKzo7Noes/view?usp=sharing and run it on your R. Soon it will be available as web service.
